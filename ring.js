@@ -1,41 +1,43 @@
-
-import { RingApi } from 'ring-client-api'
-
-import { email, password } from './secrets.js'
-
-// note that RingApi returns a promise - the promise resolves when you are authenticated/
-// authorised and have a session ready to start interacting with your ring deviecs. This
-// promise will reject if for some reason you are not able to log in
+import {RingApi } from "ring-client-api";
 
 async function example() {
-    const ringApi = new RingApi({
-        // Replace with your refresh token
-        refreshToken: process.env.RING_REFRESH_TOKEN!,
-        debug: true,
-      }),
-      cameras = await ringApi.getCameras(),
-      camera = cameras[0]
-  
-    if (!camera) {
-      console.log('No cameras found')
-      return
+  const { env } = process,
+    ringApi = new RingApi({
+      // This value comes from the .env file
+      refreshToken: env.RING_REFRESH_TOKEN,
+      debug: true,
+    }),
+    locations = await ringApi.getLocations(),
+    allCameras = await ringApi.getCameras();
+
+  console.log(
+    `Found ${locations.length} location(s) with ${allCameras.length} camera(s).`
+  );
+  for (const location of locations) {
+    const cameras = location.cameras,
+      devices = await location.getDevices();
+
+    console.log(
+      `\nLocation ${location.name} (${location.id}) has the following ${cameras.length} camera(s):`
+    );
+
+    for (const camera of cameras) {
+      console.log(`- ${camera.id}: ${camera.name} (${camera.deviceType})`);
     }
-  
-    // clean/create the output directory
-    await cleanOutputDirectory()
-  
-    console.log(`Starting Video from ${camera.name} ...`)
-    await camera.recordToFile(path.join(outputDirectory, 'example.mp4'), 10)
-    console.log('Done recording video')
-    process.exit(0)
+
+    console.log(
+      `\nLocation ${location.name} (${location.id}) has the following ${devices.length} device(s):`
+    );
+
+    for (const device of devices) {
+      console.log(`- ${device.zid}: ${device.name} (${device.deviceType})`);
+    }
   }
-  
-  example().catch((e) => {
+}
+example().catch((e) => {
     console.error(e)
     process.exit(1)
   })
-}
-
 // const logActivity = activity => console.log( 'there is a activity', activity );
 
 // ringApi.events.on('activity', logActivity);
