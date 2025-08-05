@@ -138,3 +138,12 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 secrets.js
+gash_model.json
+*package.json
+*package-lock.json
+public/output/example_7527750001648508708.mp4
+public/output/example_7527761542225633060.mp4
+public/index.html
+output/part0.mp4
+secrets.js
+package.json
